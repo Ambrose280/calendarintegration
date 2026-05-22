@@ -13,7 +13,9 @@ SCOPES = [
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/calendar.events'
 ]
-REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/callback")
+REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+if not REDIRECT_URI:
+    raise ValueError("GOOGLE_REDIRECT_URI environment variable is required")
 
 def get_google_client_config():
     client_id = os.getenv("GOOGLE_CLIENT_ID")
