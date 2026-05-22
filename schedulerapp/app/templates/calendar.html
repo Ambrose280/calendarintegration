@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Setup Availability</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">BookingApp</a>
+        <a href="/" class="btn" style="background: transparent; color: var(--text-main); border: 1px solid var(--border);">Client View</a>
+    </nav>
+
+    <div class="container">
+        <div class="header-text">
+            <h1>Set Availability</h1>
+            <p>Define your weekly schedule.</p>
+        </div>
+
+        <div class="card" style="margin-bottom: 2rem;">
+            <h2>Add Availability Block</h2>
+            <form action="/availability" method="POST" style="margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Day of Week</label>
+                    <select name="day_of_week" class="form-control" required>
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                        <option value="0">Sunday</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 1rem;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" name="start_time_str" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">End Time</label>
+                        <input type="time" name="end_time_str" class="form-control" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">Add Block</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Current Availability</h2>
+            <ul style="margin-top: 1rem; padding-left: 1rem;">
+                {% for avail in availability %}
+                    <li style="margin-bottom: 0.5rem; color: var(--text-main);">
+                        {% if avail.day_of_week == 1 %}Monday
+                        {% elif avail.day_of_week == 2 %}Tuesday
+                        {% elif avail.day_of_week == 3 %}Wednesday
+                        {% elif avail.day_of_week == 4 %}Thursday
+                        {% elif avail.day_of_week == 5 %}Friday
+                        {% elif avail.day_of_week == 6 %}Saturday
+                        {% elif avail.day_of_week == 0 %}Sunday
+                        {% endif %}
+                        : {{ avail.start_time_str }} to {{ avail.end_time_str }}
+                    </li>
+                {% else %}
+                    <p style="color: var(--text-muted);">No availability set yet.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

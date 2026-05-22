@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Cleaners - Book a Service</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Load PayPal JS SDK dynamically -->
+    <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">Elite Cleaners</a>
+        <div style="grid-column: 3; justify-self: end; display: flex; align-items: center; gap: 1rem;">
+            {% if user_name %}
+                <span style="font-weight: 700; color: var(--text-main);">Hi, {{ user_name }}</span>
+                <a href="/logout" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Logout</a>
+            {% else %}
+                <a href="/login" class="btn" style="padding: 0.5rem 1rem;">Sign in with Google</a>
+            {% endif %}
+            <a href="/calendar" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Admin</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Professional Cleaning. Uncompromising Quality.</h1>
+            <p>Select a service below, choose your preferred time, and complete your booking seamlessly.</p>
+        </div>
+
+        <div class="integrations" style="margin-top: 0; padding-top: 0; border-top: none; margin-bottom: 4rem;">
+            <h2 style="font-size: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem;">Seamless Integrations</h2>
+            <div class="integrations-logos">
+                <div style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem; font-size: 1.5rem;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" alt="Google Calendar" style="width: 40px; height: 40px; filter: none; opacity: 1;">
+                    Google Calendar
+                </div>
+                <div style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem; font-size: 1.5rem;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Google_Meet_icon_%282020%29.svg" alt="Google Meet" style="width: 40px; height: 40px; filter: none; opacity: 1;">
+                    Google Meet
+                </div>
+                <div style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem; font-size: 1.5rem;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" style="width: 40px; height: 40px; filter: none; opacity: 1;">
+                    Gmail
+                </div>
+            </div>
+        </div>
+
+        <div class="services-grid">
+            <!-- Service 1 -->
+            <div class="card service-card">
+                <div class="service-header">
+                    <h3>Standard Cleaning</h3>
+                    <div class="service-price">$120.00</div>
+                </div>
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Routine cleaning for a tidy home. Includes dusting, vacuuming, mopping, and bathroom sanitation.</p>
+                <button class="btn book-service-btn" data-service="Standard Cleaning" data-price="120.00" style="margin-top: auto;">Book Now</button>
+            </div>
+            
+            <!-- Service 2 -->
+            <div class="card service-card">
+                <div class="service-header">
+                    <h3>Deep Cleaning</h3>
+                    <div class="service-price">$200.00</div>
+                </div>
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Thorough cleaning of all areas, including inside appliances, baseboards, and hard-to-reach spots.</p>
+                <button class="btn book-service-btn" data-service="Deep Cleaning" data-price="200.00" style="margin-top: auto;">Book Now</button>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="card service-card">
+                <div class="service-header">
+                    <h3>Move-In / Move-Out</h3>
+                    <div class="service-price">$250.00</div>
+                </div>
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Ensure your old or new home is spotless. Perfect for landlords or tenants transitioning spaces.</p>
+                <button class="btn book-service-btn" data-service="Move-In / Move-Out" data-price="250.00" style="margin-top: auto;">Book Now</button>
+            </div>
+
+            <!-- Service 4 -->
+            <div class="card service-card">
+                <div class="service-header">
+                    <h3>Office Cleaning</h3>
+                    <div class="service-price">$180.00</div>
+                </div>
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Keep your workspace professional and sanitary. Desks, breakrooms, and office restrooms.</p>
+                <button class="btn book-service-btn" data-service="Office Cleaning" data-price="180.00" style="margin-top: auto;">Book Now</button>
+            </div>
+
+            <!-- Service 5 -->
+            <div class="card service-card">
+                <div class="service-header">
+                    <h3>Post-Construction</h3>
+                    <div class="service-price">$350.00</div>
+                </div>
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Heavy duty cleaning to remove dust, debris, and construction residue after renovations.</p>
+                <button class="btn book-service-btn" data-service="Post-Construction" data-price="350.00" style="margin-top: auto;">Book Now</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Multi-Step Booking Modal -->
+    <div id="booking-modal" class="modal hidden">
+        <div class="card" style="width: 100%; max-width: 900px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 1rem;">
+                <h2>Booking: <span id="modal-service-name"></span></h2>
+                <button type="button" id="close-modal" class="btn btn-secondary" style="padding: 0.5rem 1rem;">X</button>
+            </div>
+            
+            <div id="step-1" class="calendly-container">
+                <div class="calendly-ribbon"><span>POWERED BY<br><b>Elite Cleaners</b></span></div>
+                <div class="calendly-layout">
+                    <div class="calendly-calendar">
+                        <h2>Select a Date & Time</h2>
+                        <div class="calendly-month-nav">
+                            <button type="button" id="prev-month" class="nav-btn">&lt;</button>
+                            <span id="month-year-display" style="font-weight: 500;">May 2026</span>
+                            <button type="button" id="next-month" class="nav-btn active">&gt;</button>
+                        </div>
+                        <div class="calendly-grid-header">
+                            <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span>
+                        </div>
+                        <div id="calendly-days" class="calendly-grid-days">
+                            <!-- Populated via JS -->
+                        </div>
+                        <div class="calendly-timezone">
+                            <h4>Time zone</h4>
+                            <div>🌍 West Africa Time (05:32) ▾</div>
+                        </div>
+                    </div>
+                    <div id="calendly-time-slots" class="calendly-time-slots hidden">
+                        <h3 id="selected-date-display">Friday, May 22</h3>
+                        <div id="time-slots-container" class="time-slots-list">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-2" class="hidden">
+                <h3 style="margin-bottom: 1rem;">2. Details & Payment</h3>
+                <p style="margin-bottom: 1.5rem; font-weight: 700; font-size: 1.25rem;">
+                    Time: <span id="modal-time-display"></span><br>
+                    Total: $<span id="modal-price-display"></span>
+                </p>
+
+                <form id="booking-form" action="/book" method="POST">
+                    <input type="hidden" id="service_name" name="service_name">
+                    <input type="hidden" id="price" name="price">
+                    <input type="hidden" id="start_time" name="start_time">
+                    <input type="hidden" id="end_time" name="end_time">
+                    <input type="hidden" id="paypal_transaction_id" name="paypal_transaction_id">
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Name</label>
+                            <input type="text" id="client_name" name="client_name" class="form-control" required placeholder="John Doe" {% if user_name %}value="{{ user_name }}" readonly style="background-color: #f8fafc;"{% endif %}>
+                        </div>
+                        
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="client_email" name="client_email" class="form-control" required placeholder="john@example.com" {% if user_email %}value="{{ user_email }}" readonly style="background-color: #f8fafc;"{% endif %}>
+                        </div>
+                    </div>
+
+                    <div class="paypal-container" id="paypal-button-container">
+                        <!-- PayPal Buttons go here -->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pass data to frontend -->
+    <script>
+        const isLoggedIn = {% if user_name %}true{% else %}false{% endif %};
+        const availabilityData = [
+            {% for avail in availability %}
+            {
+                day: {{ avail.day_of_week }},
+                start: "{{ avail.start_time_str }}",
+                end: "{{ avail.end_time_str }}"
+            },
+            {% endfor %}
+        ];
+    </script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

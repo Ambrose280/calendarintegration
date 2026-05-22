@@ -1,0 +1,6 @@
+.env
+/schedulerapp/app/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+/bookingsys/
