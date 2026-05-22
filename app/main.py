@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 # Allow HTTP traffic for local development with OAuth
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -56,11 +56,12 @@ async def index(request: Request, db: AsyncSession = Depends(get_db)):
     )
 
 @app.get("/login")
-async def login():
+async def login(request: Request):
     flow = get_google_auth_flow()
     if not flow:
         return HTMLResponse("Google Auth not configured properly (missing .env variables).", status_code=500)
-    auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline')
+    auth_url, state = flow.authorization_url(prompt='consent', access_type='offline')
+    request.session['code_verifier'] = getattr(flow, 'code_verifier', None)
     return RedirectResponse(url=auth_url, status_code=303)
 
 @app.get("/logout")
@@ -74,6 +75,10 @@ async def auth_callback(request: Request, state: str, code: str):
     if not flow:
         return HTMLResponse("Google Auth not configured.", status_code=500)
     
+    code_verifier = request.session.get('code_verifier')
+    if code_verifier:
+        flow.code_verifier = code_verifier
+        
     flow.fetch_token(authorization_response=str(request.url))
     credentials = flow.credentials
     
@@ -136,8 +141,8 @@ async def book_appointment(
     end_time: str = Form(...),
     db: AsyncSession = Depends(get_db)
 ):
-    start_dt = datetime.datetime.fromisoformat(start_time.replace('Z', '+00:00'))
-    end_dt = datetime.datetime.fromisoformat(end_time.replace('Z', '+00:00'))
+    start_dt = datetime.datetime.fromisoformat(start_time.replace('Z', '+00:00')).replace(tzinfo=None)
+    end_dt = datetime.datetime.fromisoformat(end_time.replace('Z', '+00:00')).replace(tzinfo=None)
     
     new_booking = Booking(
         client_name=client_name,
