@@ -8,3 +8,8 @@ google-api-python-client
 httpx
 python-multipart
 python-dotenv
+gunicorn
+itsdangerous
+asyncpg
+greenlet
+requests
